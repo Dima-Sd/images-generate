@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Особистий кабінет</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #ec3c05;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-color: #c73304;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>👋 Ласкаво просимо до кабінету</h1>
+    <p>Ви успішно авторизувались.</p>
+
+    <button id="logoutBtn" class="button">Вийти</button>
+
+    <script>
+        // ✅ Перевірка токена
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('/api/me', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!res.ok) {
+                    window.location.href = '/login.html';
+                }
+            } catch (err) {
+                window.location.href = '/login.html';
+            }
+        });
+
+        // 🔓 Обробник кнопки Вийти
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+            try {
+                const res = await fetch('/api/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (res.ok) {
+                    alert('✅ Ви вийшли з акаунта');
+                    window.location.href = '/login.html';
+                } else {
+                    alert('❌ Помилка при виході');
+                }
+            } catch (err) {
+                alert('⚠️ Сервер недоступний');
+            }
+        });
+    </script>
+</body>
+
+</html>

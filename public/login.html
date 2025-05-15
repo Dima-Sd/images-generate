@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Форма входу</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <form class="form" id="loginForm" novalidate>
+                <h3 class="form__title">Вхід у систему</h3>
+
+                <label class="form__label" for="email">
+                    Email
+                    <input class="form__input" type="email" id="email" />
+                    <div class="error-message" id="emailError"></div> <!-- ✅ -->
+                </label>
+
+                <label class="form__label" for="password">
+                    Пароль
+                    <input class="form__input" type="password" id="password" />
+                    <div class="error-message" id="passwordError"></div> <!-- ✅ -->
+                </label>
+
+                <button class="button form__button" type="submit">Увійти</button>
+            </form>
+
+            <div class="form__label" id="message"></div>
+        </div>
+    </div>
+    <script>
+        const form = document.getElementById('loginForm');
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            // Очистити попередні повідомлення
+            emailInput.style.backgroundColor = '';
+            passwordInput.style.backgroundColor = '';
+            emailError.textContent = '';
+            passwordError.textContent = '';
+
+            let isValid = true;
+
+            // Валідація email
+            if (!email.includes('@')) {
+                emailInput.style.backgroundColor = '#fdd';
+                emailError.textContent = '📧 Введіть коректний email';
+                isValid = false;
+            }
+
+            // Валідація пароля
+            if (password.length < 6) {
+                passwordInput.style.backgroundColor = '#fdd';
+                passwordError.textContent = '🔐 Пароль має бути щонайменше 6 символів';
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    window.location.href = '/dashboard.html';
+                } else {
+                    passwordError.textContent = data.message || '❌ Помилка входу';
+                }
+            } catch (err) {
+                passwordError.textContent = '⚠️ Сервер недоступний';
+            }
+        });
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Реєстрація</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <form class="form" id="registerForm" novalidate>
+                <h3 class="form__title">Реєстрація</h3>
+
+                <label class="form__label" for="email">
+                    Email
+                    <input class="form__input" type="email" id="email" />
+                    <div class="error-message" id="emailError"></div>
+                </label>
+
+                <label class="form__label" for="password">
+                    Пароль
+                    <input class="form__input" type="password" id="password" />
+                    <div class="error-message" id="passwordError"></div>
+                </label>
+
+                <button class="button form__button" type="submit">Зареєструватися</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('registerForm');
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            emailInput.style.backgroundColor = '';
+            passwordInput.style.backgroundColor = '';
+            emailError.textContent = '';
+            passwordError.textContent = '';
+
+            let isValid = true;
+
+            if (!email.includes('@')) {
+                emailInput.style.backgroundColor = '#fdd';
+                emailError.textContent = '📧 Введіть коректний email';
+                isValid = false;
+            }
+
+            if (password.length < 6) {
+                passwordInput.style.backgroundColor = '#fdd';
+                passwordError.textContent = '🔐 Пароль має бути щонайменше 6 символів';
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    emailInput.value = '';
+                    passwordInput.value = '';
+                    alert('✅ Реєстрація успішна. Перевірте пошту.');
+                } else {
+                    passwordError.textContent = data.message || '❌ Помилка реєстрації';
+                }
+            } catch (err) {
+                passwordError.textContent = '⚠️ Сервер недоступний';
+            }
+        });
+    </script>
+</body>
+
+</html>
